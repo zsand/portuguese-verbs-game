@@ -497,6 +497,30 @@
     to   { transform: translateY(0);     opacity: 1; }
   }
 
+  .sound-toggle {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid #aed581;
+    font-size: 22px;
+    cursor: pointer;
+    z-index: 400;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: transform 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .sound-toggle:hover { transform: scale(1.1); }
+  .sound-toggle:active { transform: scale(0.95); }
+  .sound-toggle.muted { background: #ffebee; border-color: #ef9a9a; }
+
   .unlock-toast {
     position: fixed;
     top: 20px;
@@ -524,6 +548,8 @@
 </style>
 </head>
 <body>
+
+<button class="sound-toggle" id="soundToggle" title="Звук">🔊</button>
 
 <div class="game">
   <h1>🇵🇹 Verbos no Passado</h1>
@@ -896,9 +922,23 @@
                      streak >= 3  ? '🔥' : '';
   }
 
+  let audioCtx = null;
+  let soundOn = localStorage.getItem('soundOn') !== 'false';
+  let musicGain = null;
+  let musicTimer = null;
+
+  function getCtx() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  }
+
   function playSound(correct) {
+    if (!soundOn) return;
     try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const ctx = getCtx();
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.connect(gain);
@@ -920,6 +960,101 @@
     } catch(e) {}
   }
 
+  // Frequencies
+  const N = {
+    C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, G4: 392.00, A4: 440.00, B4: 493.88,
+    C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99, A5: 880.00,
+    C3: 130.81, E3: 164.81, F3: 174.61, G3: 196.00, A3: 220.00,
+  };
+
+  // 16-step jolly melody loop (8 bars, 0.4s per beat = ~150 BPM feel)
+  const melody = [
+    // Bar 1-2 (C major)
+    {n:'E5',d:0.4}, {n:'G5',d:0.4}, {n:'E5',d:0.4}, {n:'C5',d:0.4},
+    {n:'D5',d:0.4}, {n:'E5',d:0.4}, {n:'D5',d:0.4}, {n:'C5',d:0.4},
+    // Bar 3-4 (A minor)
+    {n:'A4',d:0.4}, {n:'C5',d:0.4}, {n:'E5',d:0.4}, {n:'C5',d:0.4},
+    {n:'B4',d:0.4}, {n:'D5',d:0.4}, {n:'B4',d:0.4}, {n:'A4',d:0.4},
+    // Bar 5-6 (F major)
+    {n:'F4',d:0.4}, {n:'A4',d:0.4}, {n:'C5',d:0.4}, {n:'A4',d:0.4},
+    {n:'G4',d:0.4}, {n:'A4',d:0.4}, {n:'G4',d:0.4}, {n:'F4',d:0.4},
+    // Bar 7-8 (G7 -> C)
+    {n:'G4',d:0.4}, {n:'B4',d:0.4}, {n:'D5',d:0.4}, {n:'G5',d:0.4},
+    {n:'F5',d:0.4}, {n:'E5',d:0.4}, {n:'D5',d:0.4}, {n:'C5',d:0.8},
+  ];
+
+  const bass = [
+    {n:'C3',d:1.6}, {n:'A3',d:1.6}, {n:'F3',d:1.6}, {n:'G3',d:0.8}, {n:'C3',d:0.8},
+  ];
+
+  function playNote(ctx, freq, startTime, duration, type, peak) {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
+    osc.connect(gain);
+    gain.connect(musicGain);
+    const t0 = startTime;
+    gain.gain.setValueAtTime(0.0001, t0);
+    gain.gain.exponentialRampToValueAtTime(peak, t0 + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + duration * 0.95);
+    osc.start(t0);
+    osc.stop(t0 + duration);
+  }
+
+  function scheduleLoop() {
+    if (!soundOn || !musicGain) return;
+    const ctx = audioCtx;
+    const t = ctx.currentTime + 0.05;
+
+    let cursor = 0;
+    melody.forEach(note => {
+      playNote(ctx, N[note.n], t + cursor, note.d, 'triangle', 0.07);
+      cursor += note.d;
+    });
+
+    let bassCursor = 0;
+    bass.forEach(note => {
+      playNote(ctx, N[note.n], t + bassCursor, note.d, 'sine', 0.10);
+      bassCursor += note.d;
+    });
+
+    const totalDuration = melody.reduce((s, n) => s + n.d, 0);
+    musicTimer = setTimeout(scheduleLoop, totalDuration * 1000);
+  }
+
+  function startMusic() {
+    if (!soundOn) return;
+    const ctx = getCtx();
+    if (musicGain) return;
+    musicGain = ctx.createGain();
+    musicGain.gain.value = 0.5;
+    musicGain.connect(ctx.destination);
+    scheduleLoop();
+  }
+
+  function stopMusic() {
+    if (musicTimer) clearTimeout(musicTimer);
+    musicTimer = null;
+    if (musicGain) {
+      try { musicGain.disconnect(); } catch(e) {}
+      musicGain = null;
+    }
+  }
+
+  function toggleSound() {
+    soundOn = !soundOn;
+    localStorage.setItem('soundOn', soundOn);
+    const btn = $('soundToggle');
+    btn.textContent = soundOn ? '🔊' : '🔇';
+    btn.classList.toggle('muted', !soundOn);
+    if (soundOn) {
+      startMusic();
+    } else {
+      stopMusic();
+    }
+  }
+
   function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     $(id).classList.add('active');
@@ -935,11 +1070,13 @@
     showScreen('gameScreen');
     updateStats();
     nextQuestion();
+    startMusic();
   }
 
   function playLevelUpSound() {
+    if (!soundOn) return;
     try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const ctx = getCtx();
       const notes = [523, 659, 784, 1047];
       notes.forEach((freq, i) => {
         const osc = ctx.createOscillator();
@@ -994,6 +1131,11 @@
 
   $('nextBtn').onclick = nextQuestion;
   $('backBtn').onclick = () => showScreen('menuScreen');
+  $('soundToggle').onclick = toggleSound;
+  if (!soundOn) {
+    $('soundToggle').textContent = '🔇';
+    $('soundToggle').classList.add('muted');
+  }
   $('refBtn1').onclick = () => $('modal').classList.add('active');
   $('refBtn2').onclick = () => $('modal').classList.add('active');
   $('closeBtn').onclick = () => $('modal').classList.remove('active');
