@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Учим португальские глаголы! 🇵🇹</title>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -384,29 +385,141 @@
     font-size: 16px;
   }
 
-  .level-up {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: #ffeb3b;
-    padding: 24px 48px;
-    border-radius: 20px;
-    font-size: 32px;
-    font-weight: bold;
-    color: #f57c00;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-    animation: popup 1.5s ease-out forwards;
-    pointer-events: none;
-    z-index: 200;
+  .rank-display {
+    text-align: center;
+    background: linear-gradient(135deg, #fce4ec, #f3e5f5);
+    border-radius: 16px;
+    padding: 12px;
+    margin-bottom: 16px;
+    border: 3px solid #f8bbd0;
   }
 
-  @keyframes popup {
-    0% { transform: translate(-50%, -50%) scale(0); }
-    20% { transform: translate(-50%, -50%) scale(1.2); }
-    40% { transform: translate(-50%, -50%) scale(1); }
-    80% { opacity: 1; }
-    100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+  .rank-emoji {
+    font-size: 36px;
+    line-height: 1;
+  }
+
+  .rank-name {
+    font-size: 16px;
+    color: #ad1457;
+    font-weight: bold;
+    margin-top: 4px;
+  }
+
+  .rank-progress {
+    font-size: 12px;
+    color: #888;
+    margin-top: 2px;
+  }
+
+  .streak-badge {
+    display: inline-block;
+    margin-left: 6px;
+    font-size: 18px;
+    animation: pulse 0.8s infinite alternate;
+  }
+
+  @keyframes pulse {
+    from { transform: scale(1); }
+    to   { transform: scale(1.2); }
+  }
+
+  .level-up-overlay {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle, rgba(255,235,238,0.95), rgba(243,229,245,0.95));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 300;
+    animation: fadeIn 0.4s;
+    cursor: pointer;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  .level-up-emoji {
+    font-size: 120px;
+    animation: bigBounce 1s ease-out;
+    filter: drop-shadow(0 8px 20px rgba(0,0,0,0.2));
+  }
+
+  @keyframes bigBounce {
+    0%   { transform: scale(0) rotate(-180deg); }
+    50%  { transform: scale(1.3) rotate(20deg); }
+    70%  { transform: scale(0.9) rotate(-10deg); }
+    100% { transform: scale(1) rotate(0); }
+  }
+
+  .level-up-title {
+    font-size: 28px;
+    color: #c2185b;
+    font-weight: bold;
+    margin-top: 20px;
+    text-align: center;
+    animation: slideUp 0.6s 0.3s both;
+  }
+
+  .level-up-subtitle {
+    font-size: 18px;
+    color: #ad1457;
+    margin-top: 8px;
+    animation: slideUp 0.6s 0.5s both;
+  }
+
+  .level-up-unlock {
+    background: white;
+    border: 3px solid #f48fb1;
+    border-radius: 16px;
+    padding: 12px 20px;
+    margin-top: 16px;
+    color: #ad1457;
+    font-size: 14px;
+    animation: slideUp 0.6s 0.7s both;
+    max-width: 80%;
+    text-align: center;
+  }
+
+  .level-up-tap {
+    margin-top: 24px;
+    color: #ad1457;
+    font-size: 14px;
+    opacity: 0.7;
+    animation: slideUp 0.6s 0.9s both;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to   { transform: translateY(0);     opacity: 1; }
+  }
+
+  .unlock-toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff3e0;
+    border: 2px solid #ffb74d;
+    border-radius: 16px;
+    padding: 10px 20px;
+    color: #e65100;
+    font-weight: bold;
+    z-index: 250;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    animation: toastIn 0.4s, toastOut 0.4s 2.6s forwards;
+  }
+
+  @keyframes toastIn {
+    from { transform: translate(-50%, -100px); opacity: 0; }
+    to   { transform: translate(-50%, 0);      opacity: 1; }
+  }
+
+  @keyframes toastOut {
+    to { transform: translate(-50%, -100px); opacity: 0; }
   }
 </style>
 </head>
@@ -446,18 +559,27 @@
       <span class="mode-badge" id="modeBadge"></span>
     </div>
 
+    <div class="rank-display">
+      <div class="rank-emoji" id="rankEmoji">🌱</div>
+      <div class="rank-name" id="rankName">Росточек</div>
+      <div class="rank-progress" id="rankProgress">0 / 30 до следующего ранга</div>
+    </div>
+
     <div class="stats">
       <div class="stat">
         <span class="stat-label">⭐ Очки</span>
         <span class="stat-value" id="score">0</span>
       </div>
       <div class="stat">
-        <span class="stat-label">🎯 Уровень</span>
-        <span class="stat-value" id="level">1</span>
+        <span class="stat-label">🎯 Глаголов</span>
+        <span class="stat-value" id="verbCount">3</span>
       </div>
       <div class="stat">
         <span class="stat-label">🔥 Подряд</span>
-        <span class="stat-value" id="streak">0</span>
+        <span class="stat-value">
+          <span id="streak">0</span>
+          <span id="streakBadge" class="streak-badge"></span>
+        </span>
       </div>
     </div>
 
@@ -536,11 +658,23 @@
     { key: 'eles', label: 'Vocês / eles / elas' },
   ];
 
+  const ranks = [
+    { emoji: '🌱', name: 'Росточек',          subtitle: 'Только начинаешь!',           threshold: 0,    unlocks: 3  },
+    { emoji: '🌸', name: 'Цветочек',           subtitle: 'Уже распускаешься!',         threshold: 30,   unlocks: 4  },
+    { emoji: '🦋', name: 'Бабочка',            subtitle: 'Порхаешь над глаголами!',    threshold: 80,   unlocks: 5  },
+    { emoji: '🌟', name: 'Звёздочка',          subtitle: 'Светишь всё ярче!',          threshold: 150,  unlocks: 6  },
+    { emoji: '🦄', name: 'Единорожка',         subtitle: 'Магия португальского!',      threshold: 250,  unlocks: 7  },
+    { emoji: '🧚‍♀️', name: 'Фея слов',         subtitle: 'Творишь чудеса!',            threshold: 400,  unlocks: 8  },
+    { emoji: '👸', name: 'Принцесса',          subtitle: 'Королевское владение!',      threshold: 600,  unlocks: 9  },
+    { emoji: '👑', name: 'Королева глаголов',  subtitle: 'Ты правишь грамматикой!',    threshold: 850,  unlocks: 10 },
+    { emoji: '✨', name: 'Богиня',              subtitle: 'Невероятная сила!',          threshold: 1200, unlocks: 11 },
+    { emoji: '🌈', name: 'Радужная Легенда',   subtitle: 'Ты прошла всё! 🏆',          threshold: 1700, unlocks: 11 },
+  ];
+
   let score = 0;
-  let level = 1;
+  let rankIdx = 0;
   let streak = 0;
-  let questionsThisLevel = 0;
-  const QUESTIONS_PER_LEVEL = 5;
+  let bestStreak = 0;
   let currentAnswer = '';
   let mode = { type: 'mixed' };
 
@@ -597,11 +731,8 @@
       pool = verbs.filter(v => v.type === mode.value);
     }
 
-    const availableVerbs = level === 1
-      ? pool.slice(0, Math.min(3, pool.length))
-      : level === 2
-        ? pool.slice(0, Math.min(6, pool.length))
-        : pool;
+    const unlockedCount = ranks[rankIdx].unlocks;
+    const availableVerbs = pool.slice(0, Math.min(unlockedCount, pool.length));
 
     const verb = rand(availableVerbs);
     const pronoun = mode.type === 'pronoun'
@@ -636,12 +767,25 @@
     });
 
     if (choice === currentAnswer) {
-      const points = 10 + streak * 2;
+      const multiplier = streak >= 10 ? 3 : streak >= 5 ? 2 : 1;
+      const base = 10;
+      const points = base * multiplier;
       score += points;
       streak += 1;
-      $('feedback').textContent = `✅ Правильно! +${points} очков`;
+      bestStreak = Math.max(bestStreak, streak);
+
+      const milestone = streak === 3 ? ' 🔥 Огонёк!' :
+                        streak === 5 ? ' 🔥🔥 Горишь!' :
+                        streak === 10 ? ' 🔥🔥🔥 Пламя!' :
+                        streak === 15 ? ' ⚡ Молния!' : '';
+      const multTxt = multiplier > 1 ? ` (×${multiplier})` : '';
+      $('feedback').textContent = `✅ +${points}${multTxt}${milestone}`;
       $('feedback').className = 'feedback correct';
       playSound(true);
+
+      if ([3, 5, 10, 15].includes(streak)) {
+        miniConfetti();
+      }
     } else {
       btn.classList.add('wrong');
       streak = 0;
@@ -650,33 +794,106 @@
       playSound(false);
     }
 
-    questionsThisLevel += 1;
     updateStats();
 
-    if (questionsThisLevel >= QUESTIONS_PER_LEVEL && level < 3) {
-      setTimeout(levelUp, 800);
+    const nextRank = ranks[rankIdx + 1];
+    if (nextRank && score >= nextRank.threshold) {
+      setTimeout(rankUp, 700);
     }
 
     $('nextBtn').disabled = false;
   }
 
-  function levelUp() {
-    level += 1;
-    questionsThisLevel = 0;
-    const popup = document.createElement('div');
-    popup.className = 'level-up';
-    popup.textContent = `🎉 Уровень ${level}!`;
-    document.body.appendChild(popup);
-    setTimeout(() => popup.remove(), 1500);
+  function rankUp() {
+    rankIdx += 1;
+    const rank = ranks[rankIdx];
+    const prevRank = ranks[rankIdx - 1];
+
+    bigConfetti();
+    playLevelUpSound();
+
+    const overlay = document.createElement('div');
+    overlay.className = 'level-up-overlay';
+    const newVerbsCount = rank.unlocks - prevRank.unlocks;
+    const unlockText = newVerbsCount > 0 && rank.unlocks <= verbs.length
+      ? `<div class="level-up-unlock">🎁 Открыто +${newVerbsCount} новых глагол${newVerbsCount === 1 ? '' : newVerbsCount < 5 ? 'а' : 'ов'}!</div>`
+      : '';
+    overlay.innerHTML = `
+      <div class="level-up-emoji">${rank.emoji}</div>
+      <div class="level-up-title">Ты теперь ${rank.name}!</div>
+      <div class="level-up-subtitle">${rank.subtitle}</div>
+      ${unlockText}
+      <div class="level-up-tap">Нажми, чтобы продолжить</div>
+    `;
+    overlay.onclick = () => {
+      overlay.style.opacity = '0';
+      overlay.style.transition = 'opacity 0.3s';
+      setTimeout(() => overlay.remove(), 300);
+    };
+    document.body.appendChild(overlay);
+
+    setTimeout(() => bigConfetti(), 400);
+
+    if (newVerbsCount > 0 && rank.unlocks <= verbs.length) {
+      const newVerbs = verbs.slice(prevRank.unlocks, rank.unlocks)
+        .map(v => v.infinitive).join(', ');
+      setTimeout(() => showToast(`✨ Новые глаголы: ${newVerbs}`), 4000);
+    }
+
     updateStats();
   }
 
+  function showToast(text) {
+    const toast = document.createElement('div');
+    toast.className = 'unlock-toast';
+    toast.textContent = text;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+  }
+
+  function miniConfetti() {
+    if (!window.confetti) return;
+    confetti({
+      particleCount: 40,
+      spread: 60,
+      origin: { y: 0.7 },
+      colors: ['#f8bbd0', '#ce93d8', '#ffeb3b', '#aed581'],
+    });
+  }
+
+  function bigConfetti() {
+    if (!window.confetti) return;
+    const colors = ['#f8bbd0', '#ce93d8', '#b39ddb', '#90caf9', '#aed581', '#ffeb3b', '#ffab91'];
+    confetti({ particleCount: 120, spread: 90, origin: { y: 0.6 }, colors });
+    setTimeout(() => {
+      confetti({ particleCount: 60, angle: 60,  spread: 70, origin: { x: 0, y: 0.7 }, colors });
+      confetti({ particleCount: 60, angle: 120, spread: 70, origin: { x: 1, y: 0.7 }, colors });
+    }, 250);
+  }
+
   function updateStats() {
+    const rank = ranks[rankIdx];
+    const nextRank = ranks[rankIdx + 1];
     $('score').textContent = score;
-    $('level').textContent = level;
     $('streak').textContent = streak;
-    const progress = (questionsThisLevel / QUESTIONS_PER_LEVEL) * 100;
-    $('progress').style.width = Math.min(progress, 100) + '%';
+    $('rankEmoji').textContent = rank.emoji;
+    $('rankName').textContent = rank.name;
+    $('verbCount').textContent = Math.min(rank.unlocks, verbs.length);
+
+    if (nextRank) {
+      const earned = score - rank.threshold;
+      const need = nextRank.threshold - rank.threshold;
+      $('rankProgress').textContent = `${earned} / ${need} до ${nextRank.emoji} ${nextRank.name}`;
+      $('progress').style.width = Math.min(100, (earned / need) * 100) + '%';
+    } else {
+      $('rankProgress').textContent = `🏆 Максимальный ранг! Очков: ${score}`;
+      $('progress').style.width = '100%';
+    }
+
+    const sb = $('streakBadge');
+    sb.textContent = streak >= 10 ? '🔥🔥🔥' :
+                     streak >= 5  ? '🔥🔥' :
+                     streak >= 3  ? '🔥' : '';
   }
 
   function playSound(correct) {
@@ -711,13 +928,32 @@
   function startGame(newMode, badgeText) {
     mode = newMode;
     score = 0;
-    level = 1;
+    rankIdx = 0;
     streak = 0;
-    questionsThisLevel = 0;
+    bestStreak = 0;
     $('modeBadge').textContent = badgeText;
     showScreen('gameScreen');
     updateStats();
     nextQuestion();
+  }
+
+  function playLevelUpSound() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const notes = [523, 659, 784, 1047];
+      notes.forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.12);
+        gain.gain.setValueAtTime(0.0001, ctx.currentTime + i * 0.12);
+        gain.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + i * 0.12 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.25);
+        osc.start(ctx.currentTime + i * 0.12);
+        osc.stop(ctx.currentTime + i * 0.12 + 0.3);
+      });
+    } catch(e) {}
   }
 
   function buildMenus() {
