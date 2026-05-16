@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Учим португальские глаголы! 🇵🇹</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Comic Sans MS', 'Marker Felt', sans-serif;
+    background: linear-gradient(135deg, #7cb342 0%, #aed581 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .game {
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    padding: 32px;
+    max-width: 520px;
+    width: 100%;
+  }
+
+  h1 {
+    text-align: center;
+    color: #558b2f;
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: #888;
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  .stats {
+    display: flex;
+    justify-content: space-around;
+    background: #f1f8e9;
+    border-radius: 16px;
+    padding: 12px;
+    margin-bottom: 24px;
+    font-size: 16px;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-label {
+    color: #888;
+    font-size: 12px;
+    display: block;
+  }
+
+  .stat-value {
+    color: #558b2f;
+    font-weight: bold;
+    font-size: 20px;
+  }
+
+  .question-box {
+    background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    margin-bottom: 20px;
+    border: 3px solid #aed581;
+  }
+
+  .pronoun {
+    font-size: 22px;
+    color: #d84315;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+
+  .verb-info {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 16px;
+  }
+
+  .verb {
+    color: #d84315;
+    font-weight: bold;
+    font-size: 24px;
+  }
+
+  .hint {
+    font-size: 14px;
+    color: #777;
+    font-style: italic;
+    margin-top: 8px;
+  }
+
+  .options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .option-btn {
+    padding: 18px;
+    font-size: 20px;
+    font-family: inherit;
+    background: white;
+    border: 3px solid #aed581;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #333;
+    font-weight: bold;
+  }
+
+  .option-btn:hover:not(:disabled) {
+    background: #f1f8e9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  .option-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+
+  .option-btn.correct {
+    background: #66bb6a;
+    color: white;
+    border-color: #43a047;
+    animation: bounce 0.5s;
+  }
+
+  .option-btn.wrong {
+    background: #ef5350;
+    color: white;
+    border-color: #e53935;
+    animation: shake 0.4s;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+  }
+
+  .feedback {
+    text-align: center;
+    font-size: 18px;
+    min-height: 28px;
+    margin-bottom: 16px;
+    font-weight: bold;
+  }
+
+  .feedback.correct { color: #43a047; }
+  .feedback.wrong { color: #e53935; }
+
+  .next-btn {
+    width: 100%;
+    padding: 16px;
+    font-size: 18px;
+    font-family: inherit;
+    background: #ff9800;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+  }
+
+  .next-btn:hover {
+    background: #f57c00;
+    transform: translateY(-2px);
+  }
+
+  .next-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .progress-bar {
+    background: #e0e0e0;
+    border-radius: 10px;
+    height: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #66bb6a, #aed581);
+    transition: width 0.3s;
+    width: 0%;
+  }
+
+  .streak {
+    display: inline-block;
+    background: #fff3e0;
+    color: #e65100;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 14px;
+    margin-left: 8px;
+  }
+
+  .reference-btn {
+    background: none;
+    border: 2px dashed #aed581;
+    color: #558b2f;
+    padding: 8px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    width: 100%;
+    margin-top: 12px;
+  }
+
+  .reference-btn:hover {
+    background: #f1f8e9;
+  }
+
+  .modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    z-index: 100;
+  }
+
+  .modal.active { display: flex; }
+
+  .modal-content {
+    background: white;
+    border-radius: 20px;
+    padding: 24px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+  }
+
+  th, td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  th {
+    background: #aed581;
+    color: white;
+  }
+
+  td:first-child {
+    color: #555;
+    font-weight: bold;
+  }
+
+  .ending {
+    color: #d84315;
+    font-weight: bold;
+  }
+
+  .close-btn {
+    margin-top: 16px;
+    width: 100%;
+    padding: 12px;
+    background: #558b2f;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 16px;
+  }
+
+  .level-up {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #ffeb3b;
+    padding: 24px 48px;
+    border-radius: 20px;
+    font-size: 32px;
+    font-weight: bold;
+    color: #f57c00;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    animation: popup 1.5s ease-out forwards;
+    pointer-events: none;
+    z-index: 200;
+  }
+
+  @keyframes popup {
+    0% { transform: translate(-50%, -50%) scale(0); }
+    20% { transform: translate(-50%, -50%) scale(1.2); }
+    40% { transform: translate(-50%, -50%) scale(1); }
+    80% { opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="game">
+  <h1>🇵🇹 Verbos no Passado</h1>
+  <p class="subtitle">Прошедшее время португальских глаголов</p>
+
+  <div class="stats">
+    <div class="stat">
+      <span class="stat-label">⭐ Очки</span>
+      <span class="stat-value" id="score">0</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">🎯 Уровень</span>
+      <span class="stat-value" id="level">1</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">🔥 Подряд</span>
+      <span class="stat-value" id="streak">0</span>
+    </div>
+  </div>
+
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress"></div>
+  </div>
+
+  <div class="question-box">
+    <div class="pronoun" id="pronoun">Eu</div>
+    <div class="verb-info">
+      от глагола <span class="verb" id="verb">falar</span>
+    </div>
+    <div class="hint" id="hint">говорить</div>
+  </div>
+
+  <div class="options" id="options"></div>
+
+  <div class="feedback" id="feedback"></div>
+
+  <button class="next-btn" id="nextBtn" disabled>Следующий ➡️</button>
+
+  <button class="reference-btn" id="refBtn">📖 Показать таблицу</button>
+</div>
+
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <h2 style="color: #558b2f; text-align: center;">Verbos Regulares — Прошедшее время</h2>
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th>Falar</th>
+          <th>Beber</th>
+          <th>Partir</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Eu</td><td>Fal<span class="ending">ei</span></td><td>Beb<span class="ending">i</span></td><td>Part<span class="ending">i</span></td></tr>
+        <tr><td>Tu</td><td>Fal<span class="ending">aste</span></td><td>Beb<span class="ending">este</span></td><td>Part<span class="ending">iste</span></td></tr>
+        <tr><td>Você/ele/ela</td><td>Fal<span class="ending">ou</span></td><td>Beb<span class="ending">eu</span></td><td>Part<span class="ending">iu</span></td></tr>
+        <tr><td>Nós</td><td>Fal<span class="ending">ámos</span></td><td>Beb<span class="ending">emos</span></td><td>Part<span class="ending">imos</span></td></tr>
+        <tr><td>Vocês/eles/elas</td><td>Fal<span class="ending">aram</span></td><td>Beb<span class="ending">eram</span></td><td>Part<span class="ending">iram</span></td></tr>
+      </tbody>
+    </table>
+    <button class="close-btn" id="closeBtn">Закрыть</button>
+  </div>
+</div>
+
+<script>
+  const verbs = [
+    { infinitive: 'falar', translation: 'говорить', root: 'fal', type: 'ar' },
+    { infinitive: 'beber', translation: 'пить', root: 'beb', type: 'er' },
+    { infinitive: 'partir', translation: 'уезжать', root: 'part', type: 'ir' },
+    { infinitive: 'cantar', translation: 'петь', root: 'cant', type: 'ar' },
+    { infinitive: 'estudar', translation: 'учиться', root: 'estud', type: 'ar' },
+    { infinitive: 'morar', translation: 'жить', root: 'mor', type: 'ar' },
+    { infinitive: 'comer', translation: 'есть', root: 'com', type: 'er' },
+    { infinitive: 'aprender', translation: 'учить', root: 'aprend', type: 'er' },
+    { infinitive: 'vender', translation: 'продавать', root: 'vend', type: 'er' },
+    { infinitive: 'abrir', translation: 'открывать', root: 'abr', type: 'ir' },
+    { infinitive: 'decidir', translation: 'решать', root: 'decid', type: 'ir' },
+  ];
+
+  const endings = {
+    ar: { eu: 'ei',  tu: 'aste',  ele: 'ou',  nos: 'ámos',  eles: 'aram' },
+    er: { eu: 'i',   tu: 'este',  ele: 'eu',  nos: 'emos',  eles: 'eram' },
+    ir: { eu: 'i',   tu: 'iste',  ele: 'iu',  nos: 'imos',  eles: 'iram' },
+  };
+
+  const pronouns = [
+    { key: 'eu',   label: 'Eu' },
+    { key: 'tu',   label: 'Tu' },
+    { key: 'ele',  label: 'Você / ele / ela' },
+    { key: 'nos',  label: 'Nós' },
+    { key: 'eles', label: 'Vocês / eles / elas' },
+  ];
+
+  let score = 0;
+  let level = 1;
+  let streak = 0;
+  let questionsThisLevel = 0;
+  const QUESTIONS_PER_LEVEL = 5;
+  let currentAnswer = '';
+
+  const $ = id => document.getElementById(id);
+
+  function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+  function buildForm(verb, pronounKey) {
+    return verb.root + endings[verb.type][pronounKey];
+  }
+
+  function generateWrongAnswers(verb, pronounKey, correct) {
+    const wrongs = new Set();
+    const otherPronouns = pronouns.filter(p => p.key !== pronounKey);
+
+    while (wrongs.size < 3) {
+      let candidate;
+      const strategy = Math.random();
+
+      if (strategy < 0.5) {
+        const otherP = rand(otherPronouns);
+        candidate = buildForm(verb, otherP.key);
+      } else if (strategy < 0.8) {
+        const otherTypes = ['ar', 'er', 'ir'].filter(t => t !== verb.type);
+        const otherType = rand(otherTypes);
+        candidate = verb.root + endings[otherType][pronounKey];
+      } else {
+        const otherVerb = rand(verbs.filter(v => v.infinitive !== verb.infinitive));
+        candidate = otherVerb.root + endings[verb.type][pronounKey];
+      }
+
+      if (candidate !== correct) wrongs.add(candidate);
+    }
+
+    return Array.from(wrongs);
+  }
+
+  function nextQuestion() {
+    $('feedback').textContent = '';
+    $('feedback').className = 'feedback';
+    $('nextBtn').disabled = true;
+
+    const availableVerbs = level === 1
+      ? verbs.slice(0, 3)
+      : level === 2
+        ? verbs.slice(0, 6)
+        : verbs;
+
+    const verb = rand(availableVerbs);
+    const pronoun = rand(pronouns);
+    const correct = buildForm(verb, pronoun.key);
+    currentAnswer = correct;
+
+    $('pronoun').textContent = pronoun.label;
+    $('verb').textContent = verb.infinitive;
+    $('hint').textContent = verb.translation;
+
+    const wrongs = generateWrongAnswers(verb, pronoun.key, correct);
+    const all = [correct, ...wrongs].sort(() => Math.random() - 0.5);
+
+    const optionsEl = $('options');
+    optionsEl.innerHTML = '';
+    all.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = opt;
+      btn.onclick = () => checkAnswer(btn, opt);
+      optionsEl.appendChild(btn);
+    });
+  }
+
+  function checkAnswer(btn, choice) {
+    const allBtns = document.querySelectorAll('.option-btn');
+    allBtns.forEach(b => {
+      b.disabled = true;
+      if (b.textContent === currentAnswer) b.classList.add('correct');
+    });
+
+    if (choice === currentAnswer) {
+      const points = 10 + streak * 2;
+      score += points;
+      streak += 1;
+      $('feedback').textContent = `✅ Правильно! +${points} очков`;
+      $('feedback').className = 'feedback correct';
+      playSound(true);
+    } else {
+      btn.classList.add('wrong');
+      streak = 0;
+      $('feedback').textContent = `❌ Правильный ответ: ${currentAnswer}`;
+      $('feedback').className = 'feedback wrong';
+      playSound(false);
+    }
+
+    questionsThisLevel += 1;
+    updateStats();
+
+    if (questionsThisLevel >= QUESTIONS_PER_LEVEL && level < 3) {
+      setTimeout(levelUp, 800);
+    }
+
+    $('nextBtn').disabled = false;
+  }
+
+  function levelUp() {
+    level += 1;
+    questionsThisLevel = 0;
+    const popup = document.createElement('div');
+    popup.className = 'level-up';
+    popup.textContent = `🎉 Уровень ${level}!`;
+    document.body.appendChild(popup);
+    setTimeout(() => popup.remove(), 1500);
+    updateStats();
+  }
+
+  function updateStats() {
+    $('score').textContent = score;
+    $('level').textContent = level;
+    $('streak').textContent = streak;
+    const progress = (questionsThisLevel / QUESTIONS_PER_LEVEL) * 100;
+    $('progress').style.width = Math.min(progress, 100) + '%';
+  }
+
+  function playSound(correct) {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      if (correct) {
+        osc.frequency.setValueAtTime(523, ctx.currentTime);
+        osc.frequency.setValueAtTime(659, ctx.currentTime + 0.1);
+        osc.frequency.setValueAtTime(784, ctx.currentTime + 0.2);
+      } else {
+        osc.frequency.setValueAtTime(300, ctx.currentTime);
+        osc.frequency.setValueAtTime(200, ctx.currentTime + 0.15);
+      }
+
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.3);
+    } catch(e) {}
+  }
+
+  $('nextBtn').onclick = nextQuestion;
+  $('refBtn').onclick = () => $('modal').classList.add('active');
+  $('closeBtn').onclick = () => $('modal').classList.remove('active');
+  $('modal').onclick = (e) => {
+    if (e.target.id === 'modal') $('modal').classList.remove('active');
+  };
+
+  nextQuestion();
+  updateStats();
+</script>
+
+</body>
+</html>
