@@ -235,6 +235,92 @@
     background: #f1f8e9;
   }
 
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  .menu-section {
+    margin-bottom: 20px;
+  }
+
+  .menu-title {
+    font-size: 18px;
+    color: #558b2f;
+    margin-bottom: 12px;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  .menu-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .menu-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+  .menu-grid.full { grid-template-columns: 1fr; }
+
+  .menu-btn {
+    padding: 16px 12px;
+    font-size: 16px;
+    font-family: inherit;
+    background: white;
+    border: 3px solid #aed581;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #333;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .menu-btn .sub {
+    display: block;
+    font-size: 12px;
+    color: #888;
+    font-weight: normal;
+    margin-top: 4px;
+  }
+
+  .menu-btn:hover {
+    background: #f1f8e9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  .menu-btn.mixed {
+    background: linear-gradient(135deg, #ff9800, #ffb74d);
+    color: white;
+    border-color: #f57c00;
+  }
+
+  .menu-btn.mixed:hover {
+    background: linear-gradient(135deg, #f57c00, #ff9800);
+  }
+
+  .back-btn {
+    background: none;
+    border: none;
+    color: #558b2f;
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 4px 8px;
+    margin-bottom: 8px;
+  }
+
+  .back-btn:hover { text-decoration: underline; }
+
+  .mode-badge {
+    display: inline-block;
+    background: #fff3e0;
+    color: #e65100;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    margin-left: 8px;
+    font-weight: bold;
+  }
+
   .modal {
     display: none;
     position: fixed;
@@ -330,40 +416,71 @@
   <h1>🇵🇹 Verbos no Passado</h1>
   <p class="subtitle">Прошедшее время португальских глаголов</p>
 
-  <div class="stats">
-    <div class="stat">
-      <span class="stat-label">⭐ Очки</span>
-      <span class="stat-value" id="score">0</span>
+  <div class="screen active" id="menuScreen">
+    <div class="menu-section">
+      <div class="menu-title">👤 Тренировать одно лицо</div>
+      <div class="menu-grid" id="pronounMenu"></div>
     </div>
-    <div class="stat">
-      <span class="stat-label">🎯 Уровень</span>
-      <span class="stat-value" id="level">1</span>
+
+    <div class="menu-section">
+      <div class="menu-title">🔤 Тренировать одно спряжение</div>
+      <div class="menu-grid three" id="conjugationMenu"></div>
     </div>
-    <div class="stat">
-      <span class="stat-label">🔥 Подряд</span>
-      <span class="stat-value" id="streak">0</span>
+
+    <div class="menu-section">
+      <div class="menu-title">🎲 Всё вместе</div>
+      <div class="menu-grid full">
+        <button class="menu-btn mixed" data-mode="mixed">
+          🌪️ Смешанный режим
+          <span class="sub" style="color: rgba(255,255,255,0.9)">все лица и все глаголы</span>
+        </button>
+      </div>
     </div>
+
+    <button class="reference-btn" id="refBtn1">📖 Показать таблицу</button>
   </div>
 
-  <div class="progress-bar">
-    <div class="progress-fill" id="progress"></div>
-  </div>
-
-  <div class="question-box">
-    <div class="pronoun" id="pronoun">Eu</div>
-    <div class="verb-info">
-      от глагола <span class="verb" id="verb">falar</span>
+  <div class="screen" id="gameScreen">
+    <button class="back-btn" id="backBtn">← В меню</button>
+    <div style="text-align:center; margin-bottom: 12px;">
+      <span class="mode-badge" id="modeBadge"></span>
     </div>
-    <div class="hint" id="hint">говорить</div>
+
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-label">⭐ Очки</span>
+        <span class="stat-value" id="score">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">🎯 Уровень</span>
+        <span class="stat-value" id="level">1</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">🔥 Подряд</span>
+        <span class="stat-value" id="streak">0</span>
+      </div>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress"></div>
+    </div>
+
+    <div class="question-box">
+      <div class="pronoun" id="pronoun">Eu</div>
+      <div class="verb-info">
+        от глагола <span class="verb" id="verb">falar</span>
+      </div>
+      <div class="hint" id="hint">говорить</div>
+    </div>
+
+    <div class="options" id="options"></div>
+
+    <div class="feedback" id="feedback"></div>
+
+    <button class="next-btn" id="nextBtn" disabled>Следующий ➡️</button>
+
+    <button class="reference-btn" id="refBtn2">📖 Показать таблицу</button>
   </div>
-
-  <div class="options" id="options"></div>
-
-  <div class="feedback" id="feedback"></div>
-
-  <button class="next-btn" id="nextBtn" disabled>Следующий ➡️</button>
-
-  <button class="reference-btn" id="refBtn">📖 Показать таблицу</button>
 </div>
 
 <div class="modal" id="modal">
@@ -425,6 +542,7 @@
   let questionsThisLevel = 0;
   const QUESTIONS_PER_LEVEL = 5;
   let currentAnswer = '';
+  let mode = { type: 'mixed' };
 
   const $ = id => document.getElementById(id);
 
@@ -437,21 +555,30 @@
   function generateWrongAnswers(verb, pronounKey, correct) {
     const wrongs = new Set();
     const otherPronouns = pronouns.filter(p => p.key !== pronounKey);
+    const lockedPronoun = mode.type === 'pronoun';
+    const lockedConj   = mode.type === 'conjugation';
+    let attempts = 0;
 
-    while (wrongs.size < 3) {
+    while (wrongs.size < 3 && attempts < 60) {
+      attempts++;
       let candidate;
       const strategy = Math.random();
 
-      if (strategy < 0.5) {
+      if (!lockedPronoun && strategy < 0.4) {
         const otherP = rand(otherPronouns);
         candidate = buildForm(verb, otherP.key);
-      } else if (strategy < 0.8) {
+      } else if (!lockedConj && strategy < 0.75) {
         const otherTypes = ['ar', 'er', 'ir'].filter(t => t !== verb.type);
         const otherType = rand(otherTypes);
         candidate = verb.root + endings[otherType][pronounKey];
       } else {
-        const otherVerb = rand(verbs.filter(v => v.infinitive !== verb.infinitive));
-        candidate = otherVerb.root + endings[verb.type][pronounKey];
+        const verbPool = lockedConj
+          ? verbs.filter(v => v.type === verb.type && v.infinitive !== verb.infinitive)
+          : verbs.filter(v => v.infinitive !== verb.infinitive);
+        if (verbPool.length === 0) continue;
+        const otherVerb = rand(verbPool);
+        const useType = lockedPronoun ? otherVerb.type : verb.type;
+        candidate = otherVerb.root + endings[useType][pronounKey];
       }
 
       if (candidate !== correct) wrongs.add(candidate);
@@ -465,14 +592,21 @@
     $('feedback').className = 'feedback';
     $('nextBtn').disabled = true;
 
+    let pool = verbs;
+    if (mode.type === 'conjugation') {
+      pool = verbs.filter(v => v.type === mode.value);
+    }
+
     const availableVerbs = level === 1
-      ? verbs.slice(0, 3)
+      ? pool.slice(0, Math.min(3, pool.length))
       : level === 2
-        ? verbs.slice(0, 6)
-        : verbs;
+        ? pool.slice(0, Math.min(6, pool.length))
+        : pool;
 
     const verb = rand(availableVerbs);
-    const pronoun = rand(pronouns);
+    const pronoun = mode.type === 'pronoun'
+      ? pronouns.find(p => p.key === mode.value)
+      : rand(pronouns);
     const correct = buildForm(verb, pronoun.key);
     currentAnswer = correct;
 
@@ -569,15 +703,69 @@
     } catch(e) {}
   }
 
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    $(id).classList.add('active');
+  }
+
+  function startGame(newMode, badgeText) {
+    mode = newMode;
+    score = 0;
+    level = 1;
+    streak = 0;
+    questionsThisLevel = 0;
+    $('modeBadge').textContent = badgeText;
+    showScreen('gameScreen');
+    updateStats();
+    nextQuestion();
+  }
+
+  function buildMenus() {
+    const pronounMenu = $('pronounMenu');
+    pronouns.forEach(p => {
+      const btn = document.createElement('button');
+      btn.className = 'menu-btn';
+      const allForms = ['ar', 'er', 'ir'].map(t => '-' + endings[t][p.key]).join(' / ');
+      btn.innerHTML = `${p.label}<span class="sub">${allForms}</span>`;
+      btn.onclick = () => startGame(
+        { type: 'pronoun', value: p.key },
+        `👤 ${p.label}`
+      );
+      pronounMenu.appendChild(btn);
+    });
+
+    const conjMenu = $('conjugationMenu');
+    [
+      { key: 'ar', label: '-ar', example: 'falar' },
+      { key: 'er', label: '-er', example: 'beber' },
+      { key: 'ir', label: '-ir', example: 'partir' },
+    ].forEach(c => {
+      const btn = document.createElement('button');
+      btn.className = 'menu-btn';
+      btn.innerHTML = `${c.label}<span class="sub">${c.example}</span>`;
+      btn.onclick = () => startGame(
+        { type: 'conjugation', value: c.key },
+        `🔤 ${c.label}`
+      );
+      conjMenu.appendChild(btn);
+    });
+
+    document.querySelector('[data-mode="mixed"]').onclick = () => startGame(
+      { type: 'mixed' },
+      `🌪️ Смешанный`
+    );
+  }
+
   $('nextBtn').onclick = nextQuestion;
-  $('refBtn').onclick = () => $('modal').classList.add('active');
+  $('backBtn').onclick = () => showScreen('menuScreen');
+  $('refBtn1').onclick = () => $('modal').classList.add('active');
+  $('refBtn2').onclick = () => $('modal').classList.add('active');
   $('closeBtn').onclick = () => $('modal').classList.remove('active');
   $('modal').onclick = (e) => {
     if (e.target.id === 'modal') $('modal').classList.remove('active');
   };
 
-  nextQuestion();
-  updateStats();
+  buildMenus();
 </script>
 
 </body>
