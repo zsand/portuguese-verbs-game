@@ -724,9 +724,9 @@
       <thead>
         <tr>
           <th>normal</th>
-          <th style="background:#ab47bc">superioridade<br>(больше)</th>
-          <th style="background:#ab47bc">igualdade<br>(одинаково)</th>
-          <th style="background:#ab47bc">inferioridade<br>(меньше)</th>
+          <th style="background:#ab47bc">superioridade<br><small style="font-weight:normal">больше<br>(сравнит. степень)</small></th>
+          <th style="background:#ab47bc">igualdade<br><small style="font-weight:normal">равно<br>(такой же как)</small></th>
+          <th style="background:#ab47bc">inferioridade<br><small style="font-weight:normal">меньше</small></th>
         </tr>
       </thead>
       <tbody>
@@ -826,7 +826,7 @@
     sup: {
       label: 'superioridade',
       emoji: '⬆️',
-      ruLabel: 'больше / лучше',
+      ruLabel: 'больше',
       // returns { pre, post } around the adjective
       template: adj => adj.special
         ? { pre: '',        post: '(do) que',  replaceAdj: adj.special.sup }
@@ -835,7 +835,7 @@
     eq: {
       label: 'igualdade',
       emoji: '⏸️',
-      ruLabel: 'одинаково',
+      ruLabel: 'такой же как',
       template: adj => ({ pre: 'tão', post: 'como' })
     },
     inf: {
@@ -976,15 +976,17 @@
     let adjShown = tpl.replaceAdj || adj.word;
     let correct, phraseHTML, hintText;
 
+    const ruLabel = cmpTypes[typeKey].ruLabel;
+    const connector = typeKey === 'eq' ? '' : ' чем';
     if (tpl.replaceAdj) {
       // Special form: blank replaces the whole adjective
       correct = tpl.replaceAdj;
       phraseHTML = `${pair.a} ${pair.verb} <span class="blank">___</span> ${tpl.post} ${pair.b}.`;
-      hintText = `${pair.ruA} ${cmpTypes[typeKey].ruLabel} чем ${pair.ruB} (${adj.ru}). Используй особую форму!`;
+      hintText = `${pair.ruA} ${ruLabel}${connector} ${pair.ruB} (${adj.ru}). Используй особую форму!`;
     } else {
       correct = tpl.pre;
       phraseHTML = `${pair.a} ${pair.verb} <span class="blank">___</span> ${adj.word} ${tpl.post} ${pair.b}.`;
-      hintText = `${pair.ruA} ${cmpTypes[typeKey].ruLabel} чем ${pair.ruB} (${adj.ru})`;
+      hintText = `${pair.ruA} ${ruLabel}${connector} ${pair.ruB} (${adj.ru})`;
     }
 
     currentAnswer = correct;
@@ -1381,16 +1383,16 @@
 
     const cmpMenu = $('comparisonMenu');
     [
-      { key: 'sup', label: '⬆️ Больше', sub: 'mais / melhor' },
-      { key: 'eq',  label: '⏸️ Равно',  sub: 'tão … como' },
-      { key: 'inf', label: '⬇️ Меньше', sub: 'menos' },
+      { key: 'sup', label: '⬆️ Superioridade', sub: 'больше<br>(сравнит. степень)', badge: '⬆️ Superioridade — больше' },
+      { key: 'eq',  label: '⏸️ Igualdade',     sub: 'равно<br>(такой же как)',      badge: '⏸️ Igualdade — равно' },
+      { key: 'inf', label: '⬇️ Inferioridade', sub: 'меньше',                       badge: '⬇️ Inferioridade — меньше' },
     ].forEach(c => {
       const btn = document.createElement('button');
       btn.className = 'menu-btn';
       btn.innerHTML = `${c.label}<span class="sub">${c.sub}</span>`;
       btn.onclick = () => startGame(
         { topic: 'cmp', type: 'cmpType', value: c.key },
-        `${c.label}`
+        c.badge
       );
       cmpMenu.appendChild(btn);
     });
