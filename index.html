@@ -298,6 +298,62 @@
     background: linear-gradient(135deg, #f57c00, #ff9800);
   }
 
+  .menu-btn.purple {
+    background: linear-gradient(135deg, #ab47bc, #ce93d8);
+    color: white;
+    border-color: #8e24aa;
+  }
+
+  .menu-btn.purple:hover {
+    background: linear-gradient(135deg, #8e24aa, #ab47bc);
+  }
+
+  .topic-header {
+    background: linear-gradient(90deg, #aed581, #c5e1a5);
+    color: #33691e;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-weight: bold;
+    text-align: center;
+    margin: 24px 0 16px;
+    font-size: 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  }
+
+  .topic-header:first-child { margin-top: 0; }
+
+  .topic-header.topic-purple {
+    background: linear-gradient(90deg, #ce93d8, #e1bee7);
+    color: #4a148c;
+  }
+
+  .reference-btn.purple {
+    border-color: #ce93d8;
+    color: #6a1b9a;
+  }
+
+  .reference-btn.purple:hover {
+    background: #f3e5f5;
+  }
+
+  .phrase {
+    font-size: 22px;
+    line-height: 1.5;
+    color: #333;
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+
+  .phrase .blank {
+    display: inline-block;
+    min-width: 60px;
+    border-bottom: 3px dashed #ab47bc;
+    color: #ab47bc;
+    font-weight: bold;
+    padding: 0 6px;
+    margin: 0 2px;
+  }
+
   .back-btn {
     background: none;
     border: none;
@@ -552,10 +608,12 @@
 <button class="sound-toggle" id="soundToggle" title="Звук">🔊</button>
 
 <div class="game">
-  <h1>🇵🇹 Verbos no Passado</h1>
-  <p class="subtitle">Прошедшее время португальских глаголов</p>
+  <h1>🇵🇹 Português Mágico</h1>
+  <p class="subtitle">Глаголы и сравнения</p>
 
   <div class="screen active" id="menuScreen">
+    <div class="topic-header">📚 Глаголы в прошедшем времени</div>
+
     <div class="menu-section">
       <div class="menu-title">👤 Тренировать одно лицо</div>
       <div class="menu-grid" id="pronounMenu"></div>
@@ -576,7 +634,30 @@
       </div>
     </div>
 
-    <button class="reference-btn" id="refBtn1">📖 Показать таблицу</button>
+    <button class="reference-btn" id="refBtn1">📖 Таблица глаголов</button>
+
+    <div class="topic-header topic-purple">📊 Сравнения (Comparativo)</div>
+
+    <div class="menu-section">
+      <div class="menu-title">⚖️ По типу сравнения</div>
+      <div class="menu-grid three" id="comparisonMenu"></div>
+    </div>
+
+    <div class="menu-section">
+      <div class="menu-title">⭐ Особое</div>
+      <div class="menu-grid">
+        <button class="menu-btn purple" data-cmp="special">
+          🌟 Особые формы
+          <span class="sub" style="color: rgba(255,255,255,0.9)">melhor / maior / pior</span>
+        </button>
+        <button class="menu-btn purple" data-cmp="mixed">
+          🎲 Смешанный
+          <span class="sub" style="color: rgba(255,255,255,0.9)">все типы</span>
+        </button>
+      </div>
+    </div>
+
+    <button class="reference-btn purple" id="refBtnCmp">📖 Таблица сравнений</button>
   </div>
 
   <div class="screen" id="gameScreen">
@@ -613,12 +694,17 @@
       <div class="progress-fill" id="progress"></div>
     </div>
 
-    <div class="question-box">
+    <div class="question-box" id="verbQuestion">
       <div class="pronoun" id="pronoun">Eu</div>
       <div class="verb-info">
         от глагола <span class="verb" id="verb">falar</span>
       </div>
       <div class="hint" id="hint">говорить</div>
+    </div>
+
+    <div class="question-box" id="cmpQuestion" style="display:none">
+      <div class="phrase" id="phrase"></div>
+      <div class="hint" id="cmpHint"></div>
     </div>
 
     <div class="options" id="options"></div>
@@ -628,6 +714,33 @@
     <button class="next-btn" id="nextBtn" disabled>Следующий ➡️</button>
 
     <button class="reference-btn" id="refBtn2">📖 Показать таблицу</button>
+  </div>
+</div>
+
+<div class="modal" id="cmpModal">
+  <div class="modal-content">
+    <h2 style="color: #6a1b9a; text-align: center;">Comparativo — Сравнения</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>normal</th>
+          <th style="background:#ab47bc">superioridade<br>(больше)</th>
+          <th style="background:#ab47bc">igualdade<br>(одинаково)</th>
+          <th style="background:#ab47bc">inferioridade<br>(меньше)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>alto<br><small>высокий</small></td><td><b>mais</b> alto (do) <b>que</b></td><td><b>tão</b> alto <b>como</b></td><td><b>menos</b> alto (do) <b>que</b></td></tr>
+        <tr><td>longe<br><small>далеко</small></td><td><b>mais</b> longe (do) <b>que</b></td><td><b>tão</b> longe <b>como</b></td><td><b>menos</b> longe (do) <b>que</b></td></tr>
+        <tr style="background:#fff3e0"><td>bom / bem<br><small>хороший / хорошо</small></td><td><b>melhor</b> (do) <b>que</b></td><td><b>tão</b> bom/bem <b>como</b></td><td><b>menos</b> bom/bem (do) <b>que</b></td></tr>
+        <tr style="background:#fff3e0"><td>grande<br><small>большой</small></td><td><b>maior</b> (do) <b>que</b></td><td><b>tão</b> grande <b>como</b></td><td><b>menos</b> grande (do) <b>que</b></td></tr>
+        <tr style="background:#fff3e0"><td>mau / mal<br><small>плохой / плохо</small></td><td><b>pior</b> (do) <b>que</b></td><td><b>tão</b> mau/mal <b>como</b></td><td><b>menos</b> mau/mal (do) <b>que</b></td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:12px; color:#888; font-size:13px; text-align:center">
+      ⭐ Жёлтым выделены особые формы (нельзя сказать «mais bom»!)
+    </p>
+    <button class="close-btn" id="closeBtnCmp" style="background:#6a1b9a">Закрыть</button>
   </div>
 </div>
 
@@ -683,6 +796,55 @@
     { key: 'nos',  label: 'Nós' },
     { key: 'eles', label: 'Vocês / eles / elas' },
   ];
+
+  // adj: { word, ru, special? }  special: { sup, inf? }  sup = comparativo de superioridade
+  const adjectives = [
+    { word: 'alto',    ru: 'высокий' },
+    { word: 'baixo',   ru: 'низкий' },
+    { word: 'rápido',  ru: 'быстрый' },
+    { word: 'lento',   ru: 'медленный' },
+    { word: 'forte',   ru: 'сильный' },
+    { word: 'feliz',   ru: 'счастливый' },
+    { word: 'longe',   ru: 'далеко' },
+    { word: 'bonito',  ru: 'красивый' },
+    { word: 'bom',     ru: 'хороший', special: { sup: 'melhor' } },
+    { word: 'grande',  ru: 'большой', special: { sup: 'maior' } },
+    { word: 'mau',     ru: 'плохой',  special: { sup: 'pior' } },
+  ];
+
+  const subjectPairs = [
+    { a: 'Maria',     b: 'Ana',      verb: 'é',  ruA: 'Мария',      ruB: 'Ана' },
+    { a: 'João',      b: 'Pedro',    verb: 'é',  ruA: 'Жуан',       ruB: 'Педру' },
+    { a: 'O gato',    b: 'o cão',    verb: 'é',  ruA: 'кот',        ruB: 'собака' },
+    { a: 'A casa',    b: 'a escola', verb: 'é',  ruA: 'дом',        ruB: 'школа' },
+    { a: 'O carro',   b: 'a bicicleta', verb: 'é', ruA: 'машина',  ruB: 'велосипед' },
+    { a: 'O Porto',   b: 'Lisboa',   verb: 'é',  ruA: 'Порту',      ruB: 'Лиссабон' },
+  ];
+
+  // Comparativo type definitions
+  const cmpTypes = {
+    sup: {
+      label: 'superioridade',
+      emoji: '⬆️',
+      ruLabel: 'больше / лучше',
+      // returns { pre, post } around the adjective
+      template: adj => adj.special
+        ? { pre: '',        post: '(do) que',  replaceAdj: adj.special.sup }
+        : { pre: 'mais',    post: '(do) que' }
+    },
+    eq: {
+      label: 'igualdade',
+      emoji: '⏸️',
+      ruLabel: 'одинаково',
+      template: adj => ({ pre: 'tão', post: 'como' })
+    },
+    inf: {
+      label: 'inferioridade',
+      emoji: '⬇️',
+      ruLabel: 'меньше',
+      template: adj => ({ pre: 'menos', post: '(do) que' })
+    },
+  };
 
   const ranks = [
     { emoji: '🌱', name: 'Росточек',          subtitle: 'Только начинаешь!',           threshold: 0,    unlocks: 3  },
@@ -752,6 +914,17 @@
     $('feedback').className = 'feedback';
     $('nextBtn').disabled = true;
 
+    if (mode.topic === 'cmp') {
+      nextComparisonQuestion();
+    } else {
+      nextVerbQuestion();
+    }
+  }
+
+  function nextVerbQuestion() {
+    $('verbQuestion').style.display = '';
+    $('cmpQuestion').style.display = 'none';
+
     let pool = verbs;
     if (mode.type === 'conjugation') {
       pool = verbs.filter(v => v.type === mode.value);
@@ -772,8 +945,86 @@
     $('hint').textContent = verb.translation;
 
     const wrongs = generateWrongAnswers(verb, pronoun.key, correct);
-    const all = [correct, ...wrongs].sort(() => Math.random() - 0.5);
+    renderOptions([correct, ...wrongs]);
+  }
 
+  function nextComparisonQuestion() {
+    $('verbQuestion').style.display = 'none';
+    $('cmpQuestion').style.display = '';
+
+    // pick adjective pool
+    let adjPool = adjectives;
+    if (mode.type === 'special') {
+      adjPool = adjectives.filter(a => a.special);
+    }
+
+    // pick comparison type
+    let typeKey;
+    if (mode.type === 'cmpType') {
+      typeKey = mode.value;
+    } else if (mode.type === 'special') {
+      typeKey = 'sup';  // special forms only matter in superioridade
+    } else {
+      typeKey = rand(['sup', 'eq', 'inf']);
+    }
+
+    const adj = rand(adjPool);
+    const pair = rand(subjectPairs);
+    const tpl = cmpTypes[typeKey].template(adj);
+
+    // Build the displayed phrase with a blank in place of `pre` (or full adj if special)
+    let adjShown = tpl.replaceAdj || adj.word;
+    let correct, phraseHTML, hintText;
+
+    if (tpl.replaceAdj) {
+      // Special form: blank replaces the whole adjective
+      correct = tpl.replaceAdj;
+      phraseHTML = `${pair.a} ${pair.verb} <span class="blank">___</span> ${tpl.post} ${pair.b}.`;
+      hintText = `${pair.ruA} ${cmpTypes[typeKey].ruLabel} чем ${pair.ruB} (${adj.ru}). Используй особую форму!`;
+    } else {
+      correct = tpl.pre;
+      phraseHTML = `${pair.a} ${pair.verb} <span class="blank">___</span> ${adj.word} ${tpl.post} ${pair.b}.`;
+      hintText = `${pair.ruA} ${cmpTypes[typeKey].ruLabel} чем ${pair.ruB} (${adj.ru})`;
+    }
+
+    currentAnswer = correct;
+    $('phrase').innerHTML = phraseHTML;
+    $('cmpHint').textContent = hintText;
+
+    // Generate distractors
+    const wrongs = generateCmpWrongs(adj, typeKey, correct, tpl);
+    renderOptions([correct, ...wrongs]);
+  }
+
+  function generateCmpWrongs(adj, typeKey, correct, tpl) {
+    const wrongs = new Set();
+
+    if (tpl.replaceAdj) {
+      // Special form question - distractors: other special forms + "mais <adj>" lure
+      const otherSpecials = adjectives
+        .filter(a => a.special && a.special.sup !== correct)
+        .map(a => a.special.sup);
+      otherSpecials.forEach(w => wrongs.add(w));
+      wrongs.add(`mais ${adj.word}`);  // the wrong-but-tempting form
+    } else {
+      // Regular: all 3 markers + a special-form lure
+      const allMarkers = ['mais', 'tão', 'menos'];
+      allMarkers.filter(m => m !== correct).forEach(m => wrongs.add(m));
+      if (adj.special && typeKey !== 'sup') {
+        wrongs.add(adj.special.sup);  // confusion bait
+      } else if (!adj.special) {
+        wrongs.add('muito');  // common mistake
+      }
+    }
+
+    // Trim to 3
+    const arr = Array.from(wrongs).slice(0, 3);
+    while (arr.length < 3) arr.push(['mais', 'menos', 'tão', 'muito'][arr.length]);
+    return arr;
+  }
+
+  function renderOptions(answers) {
+    const all = answers.slice().sort(() => Math.random() - 0.5);
     const optionsEl = $('options');
     optionsEl.innerHTML = '';
     all.forEach(opt => {
@@ -1101,7 +1352,7 @@
       const allForms = ['ar', 'er', 'ir'].map(t => '-' + endings[t][p.key]).join(' / ');
       btn.innerHTML = `${p.label}<span class="sub">${allForms}</span>`;
       btn.onclick = () => startGame(
-        { type: 'pronoun', value: p.key },
+        { topic: 'verb', type: 'pronoun', value: p.key },
         `👤 ${p.label}`
       );
       pronounMenu.appendChild(btn);
@@ -1117,15 +1368,41 @@
       btn.className = 'menu-btn';
       btn.innerHTML = `${c.label}<span class="sub">${c.example}</span>`;
       btn.onclick = () => startGame(
-        { type: 'conjugation', value: c.key },
+        { topic: 'verb', type: 'conjugation', value: c.key },
         `🔤 ${c.label}`
       );
       conjMenu.appendChild(btn);
     });
 
     document.querySelector('[data-mode="mixed"]').onclick = () => startGame(
-      { type: 'mixed' },
+      { topic: 'verb', type: 'mixed' },
       `🌪️ Смешанный`
+    );
+
+    const cmpMenu = $('comparisonMenu');
+    [
+      { key: 'sup', label: '⬆️ Больше', sub: 'mais / melhor' },
+      { key: 'eq',  label: '⏸️ Равно',  sub: 'tão … como' },
+      { key: 'inf', label: '⬇️ Меньше', sub: 'menos' },
+    ].forEach(c => {
+      const btn = document.createElement('button');
+      btn.className = 'menu-btn';
+      btn.innerHTML = `${c.label}<span class="sub">${c.sub}</span>`;
+      btn.onclick = () => startGame(
+        { topic: 'cmp', type: 'cmpType', value: c.key },
+        `${c.label}`
+      );
+      cmpMenu.appendChild(btn);
+    });
+
+    document.querySelector('[data-cmp="special"]').onclick = () => startGame(
+      { topic: 'cmp', type: 'special' },
+      `🌟 Особые формы`
+    );
+
+    document.querySelector('[data-cmp="mixed"]').onclick = () => startGame(
+      { topic: 'cmp', type: 'mixed' },
+      `📊 Сравнения`
     );
   }
 
@@ -1137,11 +1414,18 @@
     $('soundToggle').classList.add('muted');
   }
   $('refBtn1').onclick = () => $('modal').classList.add('active');
-  $('refBtn2').onclick = () => $('modal').classList.add('active');
-  $('closeBtn').onclick = () => $('modal').classList.remove('active');
-  $('modal').onclick = (e) => {
-    if (e.target.id === 'modal') $('modal').classList.remove('active');
+  $('refBtnCmp').onclick = () => $('cmpModal').classList.add('active');
+  $('refBtn2').onclick = () => {
+    const m = mode.topic === 'cmp' ? 'cmpModal' : 'modal';
+    $(m).classList.add('active');
   };
+  $('closeBtn').onclick = () => $('modal').classList.remove('active');
+  $('closeBtnCmp').onclick = () => $('cmpModal').classList.remove('active');
+  ['modal', 'cmpModal'].forEach(id => {
+    $(id).onclick = (e) => {
+      if (e.target.id === id) $(id).classList.remove('active');
+    };
+  });
 
   buildMenus();
 </script>
